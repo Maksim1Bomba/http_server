@@ -4,42 +4,40 @@ import { logging } from './logging';
 // TODO: logger | 50/50
 // TODO: ACL
 
+interface Route {
+    path: string,
+    callback: (req: http.IncomingMessage, res: http.ServerResponse) => void
+};
+
 class Server {
-    paths: Array<string> = [];
-    routers: Object = {};
+    router: Array<Route> = [];
     server: http.Server;
     logger: Object;
-    state: Boolean = false;
 
-    constructor(paths: Array<string>) {
-        this.paths = paths;
-    }
-
-    addPaths(req, res) {
-        let path = '';
-        for (let i = 0; i <= this.paths.length - 1; i++) {
-            path = '/' + this.paths[i];
-            this.routers[path] = (req, res): void => { res.write('hello') };
-        }
-    }
-
-    check(req, res) {
-        if (!this.state) {
-            this.addPaths(req, res);
-            this.state = true;
-        }
+    addRoute(r: Route) {
+        this.router.push(r);
     }
 
     start() {
         this.server = http.createServer({}, (req: http.IncomingMessage, res: http.ServerResponse) => {
-            this.check(req, res);
             try {
-                this.routers[req.url](req, res);
+                const currentRoute = this.router.filter(
+                    (r) => r.path === req.url
+                );
+
+                if (currentRoute.length === 0) {
+                    res.statusCode = 404;
+                    res.statusMessage = http.STATUS_CODES[404];
+                } else {
+                    currentRoute[0].callback(req, res);
+                }
+
                 logging(req.url);
                 console.log('complete');
 
             } catch (e) {
                 res.statusCode = 500;
+                res.statusMessage = http.STATUS_CODES[500];
                 logging(e);
                 console.log(e);
             }
@@ -53,7 +51,10 @@ class Server {
     }
 }
 
-const server = new Server(['create', 'read', 'update', 'delete']);
+const server = new Server();
+
+server.addRoute({ path: '/create', callback: (req, res) => { res.write('create') } });
+server.addRoute({ path: '/delete', callback: (req, res) => { res.write('delete') } });
 
 server.start();
 server.listen(8000);
