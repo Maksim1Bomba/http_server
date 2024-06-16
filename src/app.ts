@@ -2,8 +2,6 @@ import * as http from 'http';
 import { logging } from './logging';
 import { config } from '../config';
 
-// const config = require('../config');
-
 // TODO: router must be module and object oriented | types!
 // TODO: logger | 50/50
 // TODO: ACL
