@@ -1,12 +1,18 @@
 import * as http from 'http';
 import { logging } from './logging';
+import { config } from '../config';
+
+// const config = require('../config');
+
 // TODO: router must be module and object oriented | types!
 // TODO: logger | 50/50
 // TODO: ACL
 
+type RouteCallback = (req: http.IncomingMessage, res: http.ServerResponse) => void;
+
 interface Route {
     path: string,
-    callback: (req: http.IncomingMessage, res: http.ServerResponse) => void
+    callback: RouteCallback
 };
 
 class Server {
@@ -14,8 +20,8 @@ class Server {
     server: http.Server;
     logger: Object;
 
-    addRoute(r: Route) {
-        this.router.push(r);
+    addRoute(path: string, callback: RouteCallback) {
+        this.router.push({ path, callback });
     }
 
     start() {
@@ -53,9 +59,9 @@ class Server {
 
 const server = new Server();
 
-server.addRoute({ path: '/create', callback: (req, res) => { res.write('create') } });
-server.addRoute({ path: '/delete', callback: (req, res) => { res.write('delete') } });
+server.addRoute('/create', (req, res) => { res.write('create') });
+server.addRoute('/delete', (req, res) => { res.write('delete') });
 
 server.start();
-server.listen(8000);
+server.listen(config.http_server.port);
 
