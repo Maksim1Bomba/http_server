@@ -8,10 +8,11 @@ function start_logging() {
     return logger
 }
 
-export function logging(data: string): void {
+function logging(data: string): void {
     const logger = start_logging();
     logger.info(data);
 }
 
+export { logging };
 
 

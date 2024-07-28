@@ -1,52 +1,56 @@
 import * as http from 'http';
-import { logging } from './logging';
+
 import { config } from '../config';
 
+import { Router } from './router';
+import { login } from './auth';
+import { create } from './users';
+
+// TODO: authentication and authorization
 // TODO: router must be module and object oriented | types!
 // TODO: logger | 50/50
 // TODO: ACL
 
-type RouteCallback = (req: http.IncomingMessage, res: http.ServerResponse) => void;
-
-interface Route {
-    path: string,
-    callback: RouteCallback
-};
-
 class Server {
-    router: Array<Route> = [];
     server: http.Server;
     logger: Object;
-
-    addRoute(path: string, callback: RouteCallback) {
-        this.router.push({ path, callback });
-    }
+    router: Router = new Router();
 
     start() {
         this.server = http.createServer({}, (req: http.IncomingMessage, res: http.ServerResponse) => {
-            try {
-                const currentRoute = this.router.filter(
-                    (r) => r.path === req.url
-                );
+            res.setHeader("Content-Type", "application/json");
 
-                if (currentRoute.length === 0) {
-                    res.statusCode = 404;
-                    res.statusMessage = http.STATUS_CODES[404];
-                } else {
-                    currentRoute[0].callback(req, res);
+            let jsonRequest: Object = {};
+
+            let data: string[] = [];
+            req.on('data', (chunk) => {
+                data.push(chunk.toString());
+            });
+            req.on('end', () => {
+                try {
+                    jsonRequest = JSON.parse(data.join(''));
+                } catch (e) {
+                    console.log('Error while parsing json request', e);
+                    jsonRequest = {};
                 }
 
-                logging(req.url);
-                console.log('complete');
+                try {
+                    const route = this.router.find(req.url);
 
-            } catch (e) {
-                res.statusCode = 500;
-                res.statusMessage = http.STATUS_CODES[500];
-                logging(e);
-                console.log(e);
-            }
-            res.end();
-
+                    if (!route) {
+                        res.statusCode = 404;
+                        res.statusMessage = http.STATUS_CODES[404];
+                    } else {
+                        route.callback(req, res, jsonRequest);
+                    }
+                    console.log('request completed', req.url);
+                } catch (e) {
+                    res.statusCode = 500;
+                    res.statusMessage = http.STATUS_CODES[500];
+                    console.log(e);
+                }
+                res.end();
+            });
         });
     }
 
@@ -57,9 +61,11 @@ class Server {
 
 const server = new Server();
 
-server.addRoute('/create', (req, res) => { res.write('create') });
-server.addRoute('/delete', (req, res) => { res.write('delete') });
+server.router.add('/login', login);
+server.router.add('/create', create);
+server.router.add('/check', create);
+
+
 
 server.start();
 server.listen(config.http_server.port);
-

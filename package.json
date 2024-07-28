@@ -5,16 +5,22 @@
   "main": "dist/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "tsc --outDir dist src/app.ts && node dist/app.js"
+    "server": "tsc --outDir dist src/app.ts && node dist/src/app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/cookie": "^0.6.0",
     "@types/node": "^20.14.2",
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "cookie": "^0.6.0",
+    "crypto": "^1.0.1",
+    "moment": "^2.30.1",
+    "moment-timezone": "^0.5.45",
+    "redis": "^4.6.15",
     "winston": "^3.13.0"
   }
 }
