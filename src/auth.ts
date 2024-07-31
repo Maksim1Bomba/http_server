@@ -1,12 +1,10 @@
 import * as http from 'http';
 import * as cookieParser from 'cookie';
-import * as randomHash from './randomHash.js';
-import * as moment from './momentDays.js'
-import * as redis from './db.js';
+import * as randomHash from './randomHash';
+import * as moment from './momentDays'
+import * as redis from './db';
 
-// TODO: redis
-
-console.log(moment.oneDay())
+console.log('Strting server at ' + moment.oneDay(0).format());
 
 const config = {
     name: 'auth_token',
@@ -32,7 +30,7 @@ function login(req: http.IncomingMessage, res: http.ServerResponse, jsonRequest:
             randomToken,
             {
                 domain: config.domain,
-                expires: moment.oneDay(config.expiresInDays),
+                // expires: moment.oneDay(config.expiresInDays).toDate(),
                 path: config.path,
                 secure: config.secure
             }

@@ -1,6 +1,7 @@
 import * as http from 'http';
+import { createClient } from 'redis';
 
-import { config } from '../config';
+import { config } from './config';
 
 import { Router } from './router';
 import { login } from './auth';
@@ -63,9 +64,22 @@ const server = new Server();
 
 server.router.add('/login', login);
 server.router.add('/create', create);
-server.router.add('/check', create);
-
-
+server.router.add('/checkRedis', checkRedis);
+server.router.add('/checkPostgres', checkPostgres);
 
 server.start();
 server.listen(config.http_server.port);
+
+async function checkRedis(){
+    const client = await createClient()
+        .on('error', err => console.log('Redis Client Error', err))
+        .connect();
+    
+    await client.set('key', 'valueZZZZZZZZZZ');
+    const value = await client.get('key');
+    console.log(value);
+    await client.disconnect();
+}
+
+function checkPostgres(){
+}
