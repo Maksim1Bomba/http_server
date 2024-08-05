@@ -1,7 +1,7 @@
 import * as http from 'http';
 import { createClient } from 'redis';
 
-import { config } from './config';
+import config from '../config.json';
 
 import { Router } from './router';
 import { login } from './auth';
@@ -68,18 +68,18 @@ server.router.add('/checkRedis', checkRedis);
 server.router.add('/checkPostgres', checkPostgres);
 
 server.start();
-server.listen(config.http_server.port);
+server.listen(config.port);
 
-async function checkRedis(){
+async function checkRedis() {
     const client = await createClient()
         .on('error', err => console.log('Redis Client Error', err))
         .connect();
-    
+
     await client.set('key', 'valueZZZZZZZZZZ');
     const value = await client.get('key');
     console.log(value);
     await client.disconnect();
 }
 
-function checkPostgres(){
+function checkPostgres() {
 }
