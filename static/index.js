@@ -2,20 +2,26 @@
 
 window.addEventListener('load', init);
 function init(){    
-    fetch('/api/create')
-	.then( => {
+    fetch('/api/check', {
+	method: 'POST',
+	body: JSON.stringify({})
+    })
+	.then(res => {
 	    if(res.status === 404){
 		throw '404';
 	    }
 	    return res.json();
 	})
-	.then(json => renderContent(json))
-	.catch(error => renderError(error));
-}
-
-function renderContent(content){
-    document.body.innerHTML = `${content.text}`;
-}
+ 	.then(json => {
+	    if (json.success) {
+		document.getElementById('login1').style.display = 'none';
+		document.body.innerHTML = `${json.id}`
+	    } else {
+		document.getElementById('login1').style.display = 'block';
+	    }
+	})
+ 	.catch(error => renderError(error));
+ }
 
 function renderError(error){
     if (error == 404){

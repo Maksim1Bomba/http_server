@@ -1,12 +1,12 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "module": "es6",
+        "module": "esnext",
         "moduleResolution": "node",
 	"resolveJsonModule": true,
 	"esModuleInterop": true,
         "lib": ["es6"],
-        "outDir": "./dist/src/",
+        "outDir": "./dist/",
         "allowSyntheticDefaultImports": true,
     },
     "include": [

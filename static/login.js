@@ -1,4 +1,6 @@
-document.getElementById('button').addEventListener('click', login);
+window.addEventListener('load', function(){
+    document.getElementById('button').addEventListener('click', login);
+});
 function login() {
     fetch('/api/login', {
 	method: 'POST',
@@ -9,22 +11,21 @@ function login() {
 	    if(res.status === 404){
 		return '404';
 	    } 
-	    console.log(res);
 	    return res.json();
 	})
-	.then(json => {
-	    // if(json.permissions.redirect === true){
-	    // 	window.location.replace('/api/create');
-	    // 	return '301';
-	    // } else {
-	    // 	renderContent(json);
-	    // }    
+	.then((json) => {
+	    if (!json.success){
+		document.getElementById('error').style.display = 'block';
+	    } else {
+		document.getElementById('login1').style.display = 'none';
+		document.body.innerHTML = json.id;
+	    }
 	})
 };
 
 
 function renderContent(content){
-    document.body.innerHTML = `${content}`;
+    document.body.innerHTML = `blabla`;
 }
 
 function renderError(error){

@@ -1,11 +1,10 @@
 import * as http from 'http';
-import { createClient } from 'redis';
 
-import config from '../config.json';
+import config from '../config.json' assert { type: 'json' };
 
 import { Router } from './router';
 import { login } from './auth';
-import { create } from './users';
+import { check } from './users';
 
 // TODO: authentication and authorization
 // TODO: router must be module and object oriented | types!
@@ -43,8 +42,9 @@ class Server {
                         res.statusMessage = http.STATUS_CODES[404];
                     } else {
                         route.callback(req, res, jsonRequest);
+                        console.log('request completed', req.url, jsonRequest);
                     }
-                    console.log('request completed', req.url);
+
                 } catch (e) {
                     res.statusCode = 500;
                     res.statusMessage = http.STATUS_CODES[500];
@@ -63,23 +63,7 @@ class Server {
 const server = new Server();
 
 server.router.add('/login', login);
-server.router.add('/create', create);
-server.router.add('/checkRedis', checkRedis);
-server.router.add('/checkPostgres', checkPostgres);
+server.router.add('/check', check);
 
 server.start();
 server.listen(config.port);
-
-async function checkRedis() {
-    const client = await createClient()
-        .on('error', err => console.log('Redis Client Error', err))
-        .connect();
-
-    await client.set('key', 'valueZZZZZZZZZZ');
-    const value = await client.get('key');
-    console.log(value);
-    await client.disconnect();
-}
-
-function checkPostgres() {
-}

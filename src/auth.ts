@@ -2,7 +2,7 @@ import * as http from 'http';
 import moment from 'moment';
 import * as cookieParser from 'cookie';
 import * as randomHash from './randomHash';
-import * as redis from './db';
+import * as redis from './nosql';
 
 console.log('Strting server at ' + moment().format());
 
@@ -14,7 +14,7 @@ const config = {
     secure: false,
 };
 
-const user_login = 'mickey';
+const user_login = 'm';
 const user_passwd = '123';
 
 interface loginRequest {
@@ -25,7 +25,7 @@ interface loginRequest {
 function login(req: http.IncomingMessage, res: http.ServerResponse, jsonRequest: loginRequest) {
     const randomToken = randomHash.randomHash(5);
     if (user_login === jsonRequest.login && user_passwd === jsonRequest.password) {
-        res.setHeader('Set-Cookie', cookieParser.serialize(
+        res.setHeader('set-cookie', cookieParser.serialize(
             config.name,
             randomToken,
             {
@@ -35,19 +35,13 @@ function login(req: http.IncomingMessage, res: http.ServerResponse, jsonRequest:
                 secure: config.secure
             }
         ));
-        redis.setCache(randomToken, 'user:123');
-        res.write(JSON.stringify({ text: 'complete' }));
+        const user: string = 'user:' + user_login;
+        redis.setCache(randomToken, user);
+        res.write(JSON.stringify({ success: true, id: user }));
         return;
     }
     res.write(JSON.stringify({ success: false }));
+    return;
 }
 
-function checkAuth(req: http.IncomingMessage, res: http.ServerResponse, jsonRequest: loginRequest) {
-    let loggedIn = false;
-
-    const cookie = cookieParser.parse(req.headers['cookie']);
-
-    res.write(JSON.stringify({ loggedIn }));
-}
-
-export { login, checkAuth };
+export { login };
