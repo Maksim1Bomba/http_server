@@ -5,7 +5,7 @@ import * as cookieParser from 'cookie';
 
 
 // TODO: access with redis, then checking db psql and send information about user`
-function check(req: http.IncomingMessage, res: http.ServerResponse) {
+async function check(req: http.IncomingMessage, res: http.ServerResponse) {
     res.setHeader("Content-Type", "application/json");
     const cookieStr = req.headers['cookie'];
     if (!cookieStr) {
@@ -17,16 +17,15 @@ function check(req: http.IncomingMessage, res: http.ServerResponse) {
         res.write(JSON.stringify({ success: false }));
         return;
     }
-    const cache = getCache(cookie.auth_token);
 
-    cache.then(value => {
-        if (!value) {
-            res.write(JSON.stringify({ success: false }));
-        } else {
-            res.write(JSON.stringify({ success: true, id: value.id }));
-        }
-        return;
-    });
+    const token = await getCache(cookie.auth_token);
+    if (!token) {
+        res.write(JSON.stringify({ success: false }));
+    } else {
+        res.write(JSON.stringify({ success: true, id: token.id }));
+    }
+
+    return;
 }
 
 export { check };

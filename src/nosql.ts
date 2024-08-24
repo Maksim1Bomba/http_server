@@ -10,7 +10,7 @@ function setCache(randomHash: string, user: string) {
         .then(() => { client.quit() });
 }
 
-function getCache(hash: string) {
+async function getCache(hash: string) {
     (async () => { client.connect() })();
     const total = client.hGetAll(hash).then(value => {
         return value

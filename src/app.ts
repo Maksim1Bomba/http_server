@@ -26,7 +26,7 @@ class Server {
             req.on('data', (chunk) => {
                 data.push(chunk.toString());
             });
-            req.on('end', () => {
+            req.on('end', async () => {
                 try {
                     jsonRequest = JSON.parse(data.join(''));
                 } catch (e) {
@@ -41,7 +41,7 @@ class Server {
                         res.statusCode = 404;
                         res.statusMessage = http.STATUS_CODES[404];
                     } else {
-                        route.callback(req, res, jsonRequest);
+                        await route.callback(req, res, jsonRequest);
                         console.log('request completed', req.url, jsonRequest);
                     }
 
