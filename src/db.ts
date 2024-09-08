@@ -21,11 +21,11 @@ async function setUserInfo() {
     client.release(true);
 }
 
-async function addUserDB(name: string, login: string, password: string) {
+async function addUserDB(name: string, login: string, password: string, randomHash) {
     const client = await pool.connect();
     await client.query(`insert into users
-        (name, login, password) 
-            values ('${name}', '${login}', '${password}')`
+        (name, login, password, randomHash) 
+            values ('${name}', '${login}', '${password}', '${randomHash}')`
     )
     client.release(true);
 }

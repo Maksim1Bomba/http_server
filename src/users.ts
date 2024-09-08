@@ -1,6 +1,6 @@
 import * as http from 'http';
 
-import { createSHA256Hash } from './randomHash'
+import { createSHA256Hash, randomHash } from './randomHash'
 import { addUserDB } from './db'
 import { getCache } from './nosql';
 import * as cookieParser from 'cookie';
@@ -16,12 +16,14 @@ interface UserAddRequest {
 
 async function addUser(req: http.IncomingMessage, res: http.ServerResponse, jsonRequest: UserAddRequest) {
     res.setHeader("Content-Type", "application/json");
+    const hash = await randomHash(10);
+
     const name: string = jsonRequest.name;
     const login: string = jsonRequest.login;
-    const password: string = await createSHA256Hash(jsonRequest.password);
-    console.log(name, login, password);
+    const password: string = await createSHA256Hash(jsonRequest.password + process.env.secret_word + hash);
+    console.log(name, login, password, hash);
 
-    await addUserDB(name, login, password)
+    await addUserDB(name, login, password, hash)
 
     res.write(JSON.stringify({ success: true }));
 
