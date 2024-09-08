@@ -19,6 +19,6 @@ function createSHA256Hash(phrase: string) {
 function randomHash(length: number) {
     return createSHA256Hash(randomChars(length));
 }
-export { randomHash };
+export { randomHash, createSHA256Hash };
 
 

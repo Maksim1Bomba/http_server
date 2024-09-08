@@ -23,6 +23,29 @@ function init(){
  	.catch(error => renderError(error));
  }
 
+function addUser(name, login, password){    
+    fetch('/api/user/add', {
+	method: 'POST',
+	body: JSON.stringify({login, password, name})
+    })
+	.then(res => {
+	    if(res.status === 404){
+		throw '404';
+	    }
+	    return res.json();
+	})
+ 	.then(json => {
+	    if (json.success) {
+		// document.getElementById('login1').style.display = 'none';
+		// document.body.innerHTML = `${json.id}`
+	    } else {
+		// document.getElementById('login1').style.display = 'block';1
+	    }
+	})
+ 	.catch(error => renderError(error));
+ }
+
+
 function renderError(error){
     if (error == 404){
 	render404();

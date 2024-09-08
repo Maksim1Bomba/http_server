@@ -4,7 +4,8 @@ import config from '../config.json' assert { type: 'json' };
 
 import { Router } from './router';
 import { login } from './auth';
-import { check } from './users';
+import { check, addUser } from './users';
+import { add } from 'winston';
 
 // TODO: authentication and authorization
 // TODO: router must be module and object oriented | types!
@@ -64,6 +65,7 @@ const server = new Server();
 
 server.router.add('/login', login);
 server.router.add('/check', check);
+server.router.add('/user/add', addUser);
 
 server.start();
 server.listen(config.port);

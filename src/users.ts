@@ -1,10 +1,33 @@
 import * as http from 'http';
 
+import { createSHA256Hash } from './randomHash'
+import { addUserDB } from './db'
 import { getCache } from './nosql';
 import * as cookieParser from 'cookie';
 
 
-// TODO: access with redis, then checking db psql and send information about user`
+// TODO: access with redis, then checking db psql and send information about user
+
+interface UserAddRequest {
+    name: string,
+    login: string,
+    password: string
+}
+
+async function addUser(req: http.IncomingMessage, res: http.ServerResponse, jsonRequest: UserAddRequest) {
+    res.setHeader("Content-Type", "application/json");
+    const name: string = jsonRequest.name;
+    const login: string = jsonRequest.login;
+    const password: string = await createSHA256Hash(jsonRequest.password);
+    console.log(name, login, password);
+
+    await addUserDB(name, login, password)
+
+    res.write(JSON.stringify({ success: true }));
+
+    return;
+}
+
 async function check(req: http.IncomingMessage, res: http.ServerResponse) {
     res.setHeader("Content-Type", "application/json");
     const cookieStr = req.headers['cookie'];
@@ -28,4 +51,4 @@ async function check(req: http.IncomingMessage, res: http.ServerResponse) {
     return;
 }
 
-export { check };
+export { check, addUser };
